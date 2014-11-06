@@ -1,0 +1,62 @@
+body {
+    margin: 2em;
+}
+
+h3 {
+    margin-bottom: 0;
+}
+
+#main {
+    font:normal medium 'Gill Sans MT','Gill Sans','Goudy Bookletter 1911',
+         'Linux Libertine O','Liberation Serif',Candara,serif;
+    padding:0;
+    margin:0 auto;
+    width:40em;
+}
+
+#main {
+    position:absolute;
+    width:90%;
+    max-width:1000px;
+}
+
+#editpane {
+    position:absolute;
+    left:0;
+    right: 425px;
+    display: block;
+}
+
+
+
+#editor {
+    height:50em;
+    width: 100%;
+}
+
+#console {
+    height:15em;
+    width: 100%;
+
+    border: 1px solid black;
+    overflow-y: scroll;
+}
+
+
+#rightpane {
+    position: absolute;
+    margin-left:25px;
+    right:0;
+    width: 400px;
+}
+
+#canvas0 {
+    display: block;
+    border: 1px solid lightgrey;
+    margin-bottom: 1em;
+    background-color: white;
+}
+
+#console {
+    margin: 0;
+}

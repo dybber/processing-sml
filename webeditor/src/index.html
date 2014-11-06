@@ -1,0 +1,207 @@
+<!doctype html>
+<head>
+	<meta charset="utf-8">
+	<title>Processing w. ML</title>
+	<meta name="author" content="Martin Dybdal">
+  <link rel="stylesheet" href="css/main.css">
+
+  <script src="js/processing.min.js"></script> 
+  <script src="js/ace.js" type="text/javascript" charset="utf-8"></script>
+
+  <script type="text/javascript" src="js/compiler.js"></script>
+  <script type="text/javascript" src="js/libraries.js"></script>
+  <script type="text/javascript" src="MLB/Js/JsUtil.sml.o.eb.js"></script>
+  <script type="text/javascript" src="MLB/Js/Processing.sml.o.eb.js"></script> 
+  <script type="text/javascript" src="MLB/Js/JsUtil-sml.js"></script>
+  <script type="text/javascript" src="MLB/Js/Processing-sml.js"></script> 
+  
+  <script type="text/javascript">
+    var loadExample = function (ex) {
+      var example = document.getElementById(ex);
+      var editor = SMLtoJs.getEditor("editor");
+      editor.setValue(example.textContent);
+    };
+  </script>
+
+</head>
+<body>
+
+<h1>Processing with SML</h1>
+
+<div id="main">
+  <div id="rightpane">
+    <canvas id="canvas0" style="    width: 400px;    height: 400px;"></canvas>
+    <input type="button" id="compilebutton" value="Compile!" />
+
+<h3>Load examples:</h3>
+<div style="font-size:90%;float:left;">
+<ul>
+<li><a href="javascript:loadExample('example01');">Ball</a></li>
+<li><a href="javascript:loadExample('example02');">Follow the mouse</a></li>
+<li><a href="javascript:loadExample('example03');">Random circles</a></li>
+<li><a href="javascript:loadExample('example04');">Smooth movement</a></li>
+<li><a href="javascript:loadExample('example05');">Funky circles</a></li>
+</ul>
+</div>
+
+  </div>
+
+  <div id="editpane">
+    <div id="editor">val start = ()
+val white = (255, 255, 255)
+
+fun setup p = (background p white;
+               frameRate p 60)
+
+fun draw p () =
+  let val (w,h) = (real (width p), real (height p))
+      val (mx,my) = (real (mouseX p), real (mouseY p))
+      val _ = line p (0.0,0.0) (mx,my)
+  in ()
+  end
+
+val _ = run setup draw start
+</div>
+<pre id="console"></pre>
+
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<pre id="example01" style="display:none;">
+val start = (100.0, 100.0, 10.0, 13.0)
+val red = (255,0,0)
+val white = (255, 255, 255)
+
+fun setup p = (background p white;
+               frameRate p 60)
+
+fun draw p (x,y, xspeed,yspeed) =
+  let val _ = background p red;
+      val _ = ellipse p (x, y) (40.0, 40.0)
+      val (w,h) = (width p, height p)
+      val newxspeed = if x > real w orelse x < 0.0
+                      then ~ xspeed
+                      else xspeed
+      val newyspeed = if y > real h orelse y < 0.0
+                      then ~ yspeed
+                      else yspeed
+  in (x + newxspeed, y + newyspeed,
+      newxspeed, newyspeed)
+  end
+
+val _ = run setup draw start
+</pre>
+
+<pre id="example02" style="display:none;">val start = ()
+val white = (255, 255, 255)
+
+fun setup p = (background p white;
+               frameRate p 60)
+
+fun draw p () =
+  let val (w,h) = (real (width p), real (height p))
+      val (mx,my) = (real (mouseX p), real (mouseY p))
+      val _ = line p (0.0,0.0) (mx,my)
+      val _ = line p (w,  0.0) (mx,my)
+      val _ = line p (0.0,h)   (mx,my)
+      val _ = line p (w,  h)   (mx,my)
+  in ()
+  end
+
+val _ = run setup draw start
+</pre>
+
+<pre id="example03" style="display:none;">val start = Random.newgen ()
+val white = (255, 255, 255)
+
+fun setup p = (background p white;
+               frameRate p 60)
+
+fun draw p rng =
+  let fun randomColour rng =
+          let val (r,g,b) = (255.0*Random.random rng,
+                             255.0*Random.random rng,
+                             255.0*Random.random rng)
+          in (floor r, floor g, floor b) end
+      val (w,h) = (width p, height p)
+      val (x,y) = (real w*Random.random rng, real h*Random.random rng)
+      val s = 100.0*Random.random rng
+      val _ = fill p (randomColour rng)
+      val _ = ellipse p (x, y) (s,s)
+  in rng
+  end
+
+val _ = run setup draw start
+</pre>
+
+<pre id="example04" style="display:none;">val start = (0, 0.0,10000.0)
+val white = (255, 255, 255)
+
+fun setup p = (background p white;
+               frameRate p 60)
+
+fun draw p (r,tx,ty) =
+  let val (w,h) = (real (width p), real (height p))
+      val (x,y) = (noise1D p tx, noise1D p ty)
+      val _ = stroke p (r,0,0)
+      val _ = line p (0.0,0.0) (x*w,y*h)
+      val _ = line p (w,  0.0) (x*w,y*h)
+      val _ = line p (0.0,h)   (x*w,y*h)
+      val _ = line p (w,  h)   (x*w,y*h)
+  in ((r + 1) mod 255,
+      tx+0.01, ty+0.01)
+  end
+
+val _ = run setup draw start
+</pre>
+
+<pre id="example05" style="display:none;">(* Ported from Processing example by Casey Reas and Ben Fry *)
+
+(* Euclidean distance *)
+fun distance (x1,y1) (x2,y2) =
+      Math.sqrt (Math.pow (x2 - x1, 2.0) +
+                 Math.pow (y2 - y1, 2.0))
+
+val nCircles = 10
+val stepSize = 400 div (nCircles-1)
+val max_dist = distance (0.0, 0.0) (400.0, 400.0)
+
+(* No state *)
+val start = ()
+
+fun setup p = noStroke p;
+
+fun drawCircles p =
+  let val mpos = (real (mouseX p), real (mouseY p))
+      fun drawCircle (i,j) =
+          let val size = distance mpos (i, j) / max_dist * 120.0
+          in
+              ellipse p (i, j) (size, size)
+          end
+  in
+      List.tabulate (nCircles, fn i =>
+        List.tabulate (nCircles, fn j =>
+          drawCircle (real (i*stepSize),
+                      real (j*stepSize))))
+  end
+
+fun draw p () =
+    (background p (51,51,51);
+     drawCircles p;
+     ())
+
+val _ = run setup draw start
+</pre>
+
+
+</body>
+</html>

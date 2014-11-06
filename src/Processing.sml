@@ -1,25 +1,43 @@
-structure Processing : PROCESSING = struct
-  type t = foreignptr
+val pobj = ref NONE;
+
+structure Processing : Processing = struct
+  type canvas = foreignptr
+  type colour = int * int * int
+
+  fun getP () =
+    case !pobj of
+        NONE   => raise Fail "Processing not initialized correctly, report a bug!"
+      | SOME p => p
+
+  fun exit p =
+      JsCore.exec1 {stmt="p.exit();",
+                    res=JsCore.unit,
+                    arg1=("p",JsCore.fptr)}
+                   p
+
+
   fun initBasic canvas setupFn drawFn =
       JsCore.exec3 {stmt = "function sketch(pjs) {" ^ 
-                           "pjs.draw = drawFn(pjs); pjs.setup = setupFn(pjs);};" ^
+                           "pjs.draw = drawFn(pjs); pjs.setup = function () {setupFn(pjs)};};" ^
                            "var p = new Processing(canvas, sketch);" ^
-                           "return p",
+                           "return p;",
                     arg1 = ("canvas",  JsCore.fptr),
                     arg2 = ("drawFn",  JsCore.==>(JsCore.fptr, JsCore.==>(JsCore.unit,JsCore.unit))),
-                    arg3 = ("setupFn", JsCore.==>(JsCore.fptr, JsCore.==>(JsCore.unit,JsCore.unit))),
-                    res  = JsCore.unit
+                    arg3 = ("setupFn", JsCore.==>(JsCore.fptr, JsCore.unit)),
+                    res  = JsCore.fptr
                    }
                    (Js.Element.toForeignPtr canvas, drawFn, setupFn)
 
   fun initWithState canvas setupFn drawFn startState =
       let val state = ref startState
           fun stateDraw p () = state := (drawFn p (!state))
-      in initBasic canvas setupFn stateDraw
+      in case !pobj of 
+             NONE => pobj := SOME (initBasic canvas setupFn stateDraw)
+           | SOME x => (exit x;
+                        pobj := SOME (initBasic canvas setupFn stateDraw))
       end
 
-  (* fun init canvas setup draw start = *)
-  (*   JsUtil.onloadHandler (fn () => initWithState canvas setup draw start) *)
+  fun init canvas setup draw start = initWithState (JsUtil.$ canvas) setup draw start
 
   fun width p =
       JsCore.exec1 {stmt="return p.width;",
@@ -46,7 +64,7 @@ structure Processing : PROCESSING = struct
                     arg1=("p",JsCore.fptr)}
                    p
 
-  fun size p (w,h) =
+  fun canvasSize p (w,h) =
       JsCore.exec3 {stmt="p.size(a1,a2);",
                     res=JsCore.unit,
                     arg1=("p", JsCore.fptr),

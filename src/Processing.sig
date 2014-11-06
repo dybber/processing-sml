@@ -1,23 +1,23 @@
-type colour = int * int * int
-
-signature PROCESSING = sig
-  type t
-  val initBasic     : Js.elem -> (t -> unit -> unit) -> (t -> unit -> unit) -> unit
-  val initWithState : Js.elem -> (t -> unit -> unit) -> (t -> 'a -> 'a) -> 'a -> unit
-  (* val init       : Js.elem -> (t -> unit -> unit) -> (t -> 'a -> 'a) -> 'a -> unit *)
-  val width         : t -> int
-  val height        : t -> int
-  val mouseX        : t -> int
-  val mouseY        : t -> int
-  val size          : t -> int * int -> unit
-  val frameRate     : t -> int -> unit
-  val noise1D       : t -> real -> real
-  val noStroke      : t -> unit
-  val stroke        : t -> colour -> unit
-  val strokeWeight  : t -> int -> unit
-  val background    : t -> colour -> unit
-  val fill          : t -> colour -> unit
-  val ellipse       : t -> real * real -> real * real -> unit
-  val rect          : t -> real * real -> real * real -> unit
-  val line          : t -> real * real -> real * real -> unit
+signature Processing = sig
+  type canvas
+  type colour = int * int * int
+  val initBasic     : Js.elem -> (canvas -> unit) -> (canvas -> unit -> unit) -> canvas
+  val initWithState : Js.elem -> (canvas -> unit) -> (canvas -> 'a -> 'a) -> 'a -> unit
+  val init          : string -> (canvas -> unit) -> (canvas -> 'a -> 'a) -> 'a -> unit
+  val exit          : canvas -> unit
+  val width         : canvas -> int
+  val height        : canvas -> int
+  val mouseX        : canvas -> int
+  val mouseY        : canvas -> int
+  val canvasSize    : canvas -> int * int -> unit
+  val frameRate     : canvas -> int -> unit
+  val noise1D       : canvas -> real -> real
+  val noStroke      : canvas -> unit
+  val stroke        : canvas -> colour -> unit
+  val strokeWeight  : canvas -> int -> unit
+  val background    : canvas -> colour -> unit
+  val fill          : canvas -> colour -> unit
+  val ellipse       : canvas -> real * real -> real * real -> unit
+  val rect          : canvas -> real * real -> real * real -> unit
+  val line          : canvas -> real * real -> real * real -> unit
 end

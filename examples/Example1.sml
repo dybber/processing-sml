@@ -1,7 +1,8 @@
+
+
+
 local
   structure P = Processing
-  fun init canvas setup draw start =
-    JsUtil.onloadHandler (fn () => P.initWithState (JsUtil.$ canvas) setup draw start)
 
   val red   = (255,  0,  0)
   val white = (255,255,255)
@@ -68,7 +69,6 @@ fun noise p (r,tx,ty) =
 fun simpleMouse p () = 
   let val (w,h) = (real (P.width p), real (P.height p))
       val (mx,my) = (real (P.mouseX p), real (P.mouseY p))
-      val _ = P.background p white;
       val _ = P.line p (0.0,0.0) (mx,my)
   in ()
   end
